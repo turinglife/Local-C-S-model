@@ -29,10 +29,10 @@ typedef struct thread_pool{
     int size;                  /* current size of jobs list */
 }Thread_pool;
 
-/* global Thread_pool variable*/
+/* Global Thread_pool variable */
 static Thread_pool * pool = NULL;
 
-/*Initialize the thread pool*/
+/* Initialize the thread pool */
 int pool_init(unsigned int thread_num)
 {
     int i;
@@ -49,7 +49,7 @@ int pool_init(unsigned int thread_num)
     pool->destroy = 0;
     pool->threads = (pthread_t *)malloc(thread_num * sizeof(pthread_t));
 
-    // create threads according to thread_num
+    // Create threads according to thread_num
     for(i = 0; i < thread_num; i++)
     {
         pthread_create(&(pool->threads[i]),NULL,routine,NULL);
@@ -92,15 +92,15 @@ int pool_add_job(void *(*process)(void *),void *arg)
 }
 
 
-/*Destroy the thread pool*/
+/* Destroy the thread pool */
 int pool_destroy(void)
 {
-    if(pool->destroy)/*Alread destroyed!*/
+    if(pool->destroy)/* Already destroyed! */
         return -1;
 
     int i;
     pool->destroy=1;
-    pthread_cond_broadcast(&(pool->job_ready));/*notify all threads*/
+    pthread_cond_broadcast(&(pool->job_ready));/* Notify all threads */
     for(i = 0; i < pool->thread_num; i++)
         pthread_join(pool->threads[i], NULL);
     free(pool->threads);
@@ -152,7 +152,7 @@ void* routine(void *arg)
         pool->jobs = job->next;
         pthread_mutex_unlock(&(pool->pool_lock));
 
-        /*process job*/
+        /* Process job */
         (*(job->process))(job->arg);
 
         free(job);
